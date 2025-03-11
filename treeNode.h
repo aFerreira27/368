@@ -9,8 +9,8 @@ typedef struct treeNode TreeNode;
 struct treeNode
 {
     Block* data;
-    struct TreeNode* left;
-    struct TreeNode* right;
+    struct treeNode* left;
+    struct treeNode* right;
     char cutAngle;
 };
 

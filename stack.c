@@ -1,17 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "treeNode.h"
-
-#define MAX_SIZE 100
+#define INITIAL_SIZE 100
 
 typedef struct {
-    TreeNode* arr[MAX_SIZE];
+    TreeNode** arr;
     int top;
+    int cap;
 } Stack;
 
 void initialize(Stack* stack) {
+    stack->arr = (TreeNode**)malloc(INITIAL_SIZE * sizeof(TreeNode*));
     stack->top = -1;
+    stack->cap = INITIAL_SIZE;
+    if (stack->arr == NULL)
+        exit(EXIT_FAILURE);
 }
 
 int isEmpty(Stack* stack) {
@@ -19,40 +24,47 @@ int isEmpty(Stack* stack) {
 }
 
 int isFull(Stack* stack) {
-    return stack->top == MAX_SIZE - 1;
+    return stack->top == stack->cap - 1;
 }
 
-void push(Stack* stack, int value) {
+void push(Stack* stack, TreeNode* node) {
     if (isFull(stack)) {
         doubleStackSize(stack);
     }
         stack->top++;
-        stack->arr[stack->top] = value;
+        stack->arr[stack->top] = node;
 }
 
 void doubleStackSize(Stack* stack)
 {
-    TreeNode* temp[sizeof(stack->arr) / sizeof(stack->arr[0]) * 2];
-    memcpy(temp, *stack->arr, sizeof(*stack->arr));
-    *stack->arr = temp;
+    stack->cap *= 2;
+    stack->arr = (TreeNode**)realloc(stack->arr, stack->cap * sizeof(TreeNode*));
+    if (stack->arr == NULL)
+        exit(EXIT_FAILURE);
 }
 
-int pop(Stack* stack) {
+TreeNode* pop(Stack* stack) {
     if (isEmpty(stack)) {
-        printf("Stack Underflow\n");
-        return -1;
+        return NULL;
     } else {
-        int value = stack->arr[stack->top];
+        TreeNode* temp = stack->arr[stack->top];
         stack->top--;
-        return value;
+        return temp;
     }
 }
 
-int peek(Stack* stack) {
+TreeNode* peek(Stack* stack) {
     if (isEmpty(stack)) {
-        // printf("Stack is empty\n");
-        return -1;
+        return NULL;
     } else {
         return stack->arr[stack->top];
     }
+}
+
+void freeStack(Stack* stack) {
+    
+    for (int i = 0; i < stack->top; i++) {
+        free(stack->arr[i]);
+    }
+    free(stack->arr);
 }
